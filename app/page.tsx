@@ -136,7 +136,7 @@ export default function Home() {
           <Button
             onClick={sendMessage}
             disabled={isLoading || !message.trim()}
-            className="w-full"
+            className="w-full bg-amber-600 text-white"
           >
             {isLoading ? "Sending..." : "Send Message"}
           </Button>
