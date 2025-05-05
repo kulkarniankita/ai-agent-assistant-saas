@@ -1,103 +1,151 @@
-import Image from "next/image";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const sendMessage = async () => {
+    if (!message.trim()) return;
+
+    // Add user message to chat
+    const userMessage: Message = { role: "user", content: message };
+    setMessages((prev) => [...prev, userMessage]);
+    setMessage(""); // Clear input
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message, context: messages }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get response");
+      }
+
+      const data = await response.json();
+      console.log("API Response:", data);
+
+      // Process and format the AI response
+      let formattedContent = "";
+      if (Array.isArray(data)) {
+        formattedContent = data
+          .map((item) => {
+            if (item.type === "text") {
+              return item.text;
+            } else if (item.type === "tool_use") {
+              if (item.name === "analyzeMessage") {
+                const analysis = item.input;
+                return `<b>📝 Formatted Message:</b>\n${analysis.formatted}\n\n<b>🎯 Tone Analysis:</b>\n${analysis.tone}\n\n<b>💡 Clarity Improvements:</b>\n${analysis.clarity}\n\n<b>✍️ Grammar Issues:</b>\n${analysis.grammarIssues}`;
+              }
+              return `Analysis:\n${JSON.stringify(item.input, null, 2)}`;
+            }
+            return "";
+          })
+          .filter(Boolean)
+          .join("\n\n");
+      } else {
+        formattedContent = JSON.stringify(data, null, 2);
+      }
+
+      // Add AI response to chat
+      const aiMessage: Message = {
+        role: "assistant",
+        content: formattedContent,
+      };
+      console.log("Processed message:", aiMessage);
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      setError("Failed to get response. Please try again.");
+      console.error("Error getting response:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8">AI Chat Assistant</h1>
+
+      <div className="space-y-6">
+        {/* Chat Messages */}
+        <div className="space-y-4 min-h-[400px] max-h-[600px] overflow-y-auto p-4 border rounded-lg">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              <Card
+                className={`max-w-[80%] ${
+                  msg.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
+                }`}
+              >
+                <CardContent className="p-4">
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <Card className="max-w-[80%] bg-muted">
+                <CardContent className="p-4">
+                  <p>Thinking...</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Input Area */}
+        <div className="space-y-4">
+          <Textarea
+            placeholder="Type your message here..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="min-h-[100px]"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+          <Button
+            onClick={sendMessage}
+            disabled={isLoading || !message.trim()}
+            className="w-full"
+          >
+            {isLoading ? "Sending..." : "Send Message"}
+          </Button>
+
+          {error && (
+            <div className="text-red-500 p-4 bg-red-50 rounded-md">{error}</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
