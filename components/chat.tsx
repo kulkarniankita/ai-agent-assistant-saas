@@ -4,10 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { HandHelping, HeartIcon, TextIcon } from "lucide-react";
 
 type Message = {
   role: "user" | "assistant";
-  content: string;
+  content:
+    | string
+    | {
+        toolResults: {
+          formatted: string;
+          tone: string;
+          clarity: string;
+          grammarIssues: string;
+        };
+      }
+    | { recipient: string; subject: string; body: string }
+    | { message: string; platform: "X" | "LinkedIn" | "BlueSky" }
+    | { text: string; threadId: string };
 };
 
 export default function Chat() {
@@ -15,6 +30,10 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const createAgentAssistantThreadAction = useAction(
+    api.agent.createAgentAssistantThread
+  );
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -27,47 +46,34 @@ export default function Chat() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message, context: messages }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to get response");
-      }
-
-      const data = await response.json();
+      const data = await createAgentAssistantThreadAction({ prompt: message });
       console.log("API Response:", data);
 
-      // Process and format the AI response
-      let formattedContent = "";
-      if (Array.isArray(data)) {
-        formattedContent = data
-          .map((item) => {
-            if (item.type === "text") {
-              return item.text;
-            } else if (item.type === "tool_use") {
-              if (item.name === "analyzeMessage") {
-                const analysis = item.input;
-                return `<b>📝 Formatted Message:</b>\n${analysis.formatted}\n\n<b>🎯 Tone Analysis:</b>\n${analysis.tone}\n\n<b>💡 Clarity Improvements:</b>\n${analysis.clarity}\n\n<b>✍️ Grammar Issues:</b>\n${analysis.grammarIssues}`;
-              }
-              return `Analysis:\n${JSON.stringify(item.input, null, 2)}`;
-            }
-            return "";
-          })
-          .filter(Boolean)
-          .join("\n\n");
-      } else {
-        formattedContent = JSON.stringify(data, null, 2);
+      let formattedContent: {
+        formatted: string;
+        tone: string;
+        clarity: string;
+        grammarIssues: string;
+      } | null = null;
+
+      if (data?.toolResults) {
+        // Process and format the AI response
+        formattedContent = data?.toolResults as {
+          formatted: string;
+          tone: string;
+          clarity: string;
+          grammarIssues: string;
+        };
       }
 
       // Add AI response to chat
       const aiMessage: Message = {
         role: "assistant",
-        content: formattedContent,
+        content: formattedContent
+          ? {
+              toolResults: formattedContent,
+            }
+          : data,
       };
       console.log("Processed message:", aiMessage);
 
@@ -82,8 +88,6 @@ export default function Chat() {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-8">AI Chat Assistant</h1>
-
       <div className="space-y-6">
         {/* Chat Messages */}
         <div className="space-y-4 min-h-[400px] max-h-[600px] overflow-y-auto p-4 border rounded-lg">
@@ -97,12 +101,55 @@ export default function Chat() {
               <Card
                 className={`max-w-[80%] ${
                   msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                    ? "bg-gray-50 text-gray-900"
+                    : "bg-white shadow-lg"
                 }`}
               >
-                <CardContent className="p-4">
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                <CardContent className="p-6">
+                  {typeof msg.content === "string" ? (
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  ) : "toolResults" in msg.content ? (
+                    <div className="space-y-6">
+                      <div className="text-base font-medium text-gray-800 leading-relaxed">
+                        {msg.content.toolResults.formatted}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                          <h4 className="font-semibold text-blue-700 mb-2 flex items-center gap-2">
+                            <HandHelping className="h-5 w-5" />
+                            Clarity
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {msg.content.toolResults.clarity}
+                          </p>
+                        </div>
+                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
+                          <h4 className="font-semibold text-purple-700 mb-2 flex items-center gap-2">
+                            <HeartIcon className="h-5 w-5" />
+                            Tone
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {msg.content.toolResults.tone}
+                          </p>
+                        </div>
+                        <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-xl border border-amber-200">
+                          <h4 className="font-semibold text-amber-700 mb-2 flex items-center gap-2">
+                            <TextIcon className="h-5 w-5" />
+                            Grammar
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {msg.content.toolResults.grammarIssues}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : "text" in msg.content ? (
+                    <p className="whitespace-pre-wrap">{msg.content.text}</p>
+                  ) : (
+                    <p className="whitespace-pre-wrap">
+                      {JSON.stringify(msg.content)}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </div>

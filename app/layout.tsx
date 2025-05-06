@@ -4,6 +4,8 @@ import { AuthKitProvider } from "@workos-inc/authkit-nextjs/components";
 import "./globals.css";
 import Header from "@/components/header";
 import { withAuth } from "@workos-inc/authkit-nextjs";
+import { ConvexClientProvider } from "./ConvexClientProvider";
+
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
@@ -26,7 +28,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${ibmPlexSans.variable} antialiased`}>
         <Header user={user} />
-        <AuthKitProvider>{children}</AuthKitProvider>
+        <ConvexClientProvider>
+          <AuthKitProvider>{children}</AuthKitProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );
