@@ -8,19 +8,41 @@ Thanks to [WorkOs](https://dub.sh/workos-authkit) for kindly sponsoring this vid
 
 [The solution code is here](/solution/index.ts)
 
-## Features
+## What This Project Covers
 
-- **Message Analysis**: Get instant feedback on your messages
-- **Formatting**: Improve message structure and formatting
-- **Tone Analysis**: Get suggestions for appropriate tone adjustments
-- **Clarity Improvements**: Identify and fix clarity issues
-- **Grammar Check**: Point out grammar issues
+- Building an AI agent with memory and context awareness
+- Implementing real-time message analysis and improvements
+- Creating a modern, responsive UI with Next.js and Shadcn
+- Setting up secure authentication with WorkOS AuthKit
+- Managing real-time state and data with Convex
+- Implementing AI tools for message analysis and email generation
+- Building type-safe APIs and validation with TypeScript and Zod
+- Deploying a production-ready application on Vercel
+
+## 📚 What You'll Learn
+
+- 🚀 Next.js 15.3 with App Router – server components and API routes
+- ⚛️ React 19 – interactive UI components with hooks
+- 🤖 Claude AI (3.5 Sonnet) – intelligent message analysis and improvements
+- 🔐 WorkOS AuthKit – secure authentication and user management
+- 🧠 AI SDK – building AI agents with memory and tools
+- 🎨 Shadcn UI – beautiful, accessible components with Radix UI
+- 💾 Convex – reactive backend with real-time state management
+- 📜 TypeScript – type-safe development
+- 👀 Zod – schema validation for AI tools and inputs
+- 💅 Tailwind CSS v4 – modern utility-first styling
+- 🚀 Deployment on Vercel – production-ready setup
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 with App Router
-- **UI**: Shadcn UI components
-- **AI**: Anthropic Claude 3 Opus
+- **Frontend**: Next.js 15.3 with App Router
+- **UI**: Shadcn UI components with Radix UI primitives
+- **AI**: Claude 3.5 Sonnet via Anthropic SDK
+- **Backend**: Convex for real-time data and state management
+- **Authentication**: WorkOS AuthKit
+- **Styling**: Tailwind CSS v4
+- **Type Safety**: TypeScript with Zod validation
+- **Development**: ESLint, Turbopack
 
 ## Getting Started
 
