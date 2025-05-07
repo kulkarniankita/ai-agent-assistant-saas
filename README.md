@@ -4,6 +4,8 @@ An AI-powered communication assistant that helps improve your messages by provid
 
 Thanks to [WorkOs](https://dub.sh/workos-authkit) for kindly sponsoring this video.
 
+[Download the Cheatsheet for free](https://dub.sh/agent-copilot) that accompanies this Github Repo for all the links and visuals.
+
 ## Features
 
 - **Message Analysis**: Get instant feedback on your messages
