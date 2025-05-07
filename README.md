@@ -6,6 +6,8 @@ Thanks to [WorkOs](https://dub.sh/workos-authkit) for kindly sponsoring this vid
 
 [Download the Cheatsheet for free](https://dub.sh/agent-copilot) that accompanies this Github Repo for all the links and visuals.
 
+[The solution code is here](/solution/index.ts)
+
 ## Features
 
 - **Message Analysis**: Get instant feedback on your messages
