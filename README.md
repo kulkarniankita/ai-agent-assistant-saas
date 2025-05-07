@@ -2,6 +2,8 @@
 
 An AI-powered communication assistant that helps improve your messages by providing formatting, tone, clarity, and grammar suggestions.
 
+Thanks to WorkOs for kindly sponsoring this video.
+
 ## Features
 
 - **Message Analysis**: Get instant feedback on your messages
