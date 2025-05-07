@@ -94,16 +94,18 @@ export default function Chat({ user }: { user: User | null }) {
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="space-y-6">
         {/* Chat Messages */}
-        <div className="space-y-4 min-h-[400px] max-h-[600px] overflow-y-auto p-4 border rounded-lg">
-          {messages.map((msg, index) => (
-            <ChatMessages key={index} msg={msg} index={index} />
-          ))}
-          {isLoading && <ThinkingCard />}
-          <div ref={messagesEndRef} />
+        <div className="space-y-4 min-h-[400px] max-h-[600px] overflow-y-auto p-6 border rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-lg">
+          <div className="space-y-6">
+            {messages.map((msg, index) => (
+              <ChatMessages key={index} msg={msg} index={index} />
+            ))}
+            {isLoading && <ThinkingCard />}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
 
         {/* Input Area */}
-        <div className="space-y-4">
+        <div className="space-y-4 bg-white rounded-2xl shadow-lg p-4">
           <ChatInput
             message={message}
             setMessage={setMessage}

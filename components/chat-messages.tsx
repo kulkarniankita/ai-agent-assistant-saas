@@ -1,6 +1,6 @@
 import { Card } from "./ui/card";
 import { CardContent } from "./ui/card";
-import { HandHelping, HeartIcon, TextIcon } from "lucide-react";
+import { HandHelping, HeartIcon, TextIcon, User, Bot } from "lucide-react";
 import { Message } from "@/@types/chat";
 
 export default function ChatMessages({
@@ -15,16 +15,30 @@ export default function ChatMessages({
   return (
     <div
       key={index}
-      className={`flex ${isUserMessage ? "justify-end" : "justify-start"}`}
+      className={`flex items-start gap-3 ${isUserMessage ? "flex-row-reverse" : "flex-row"}`}
     >
-      <Card
-        className={`max-w-[80%] ${
-          isUserMessage ? "bg-gray-50 text-gray-900" : "bg-white shadow-lg"
+      <div
+        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+          isUserMessage ? "bg-amber-100" : "bg-blue-100"
         }`}
       >
-        <CardContent className="p-6">
+        {isUserMessage ? (
+          <User className="w-5 h-5 text-amber-600" />
+        ) : (
+          <Bot className="w-5 h-5 text-blue-600" />
+        )}
+      </div>
+
+      <Card
+        className={`max-w-[80%] ${
+          isUserMessage
+            ? "bg-amber-50 text-gray-900 rounded-2xl rounded-tr-none"
+            : "bg-white shadow-lg rounded-2xl rounded-tl-none"
+        }`}
+      >
+        <CardContent className="p-4">
           {typeof msg.content === "string" ? (
-            <p className="whitespace-pre-wrap">{msg.content}</p>
+            <p className="whitespace-pre-wrap text-gray-800">{msg.content}</p>
           ) : msg.content.toolResults.type === "analyze" ? (
             <div className="space-y-6">
               <div className="text-base font-medium text-gray-800 leading-relaxed">

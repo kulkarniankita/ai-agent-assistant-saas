@@ -26,7 +26,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${ibmPlexSans.variable} antialiased`}>
+      <body className={`${ibmPlexSans.className} antialiased`}>
         <Header user={user} />
         <div className="max-w-4xl mx-auto px-4 py-8 text-center pt-12 xl:pt-24">
           <h1 className="text-4xl font-bold text-amber-900 mb-4">
