@@ -2,7 +2,7 @@
 
 An AI-powered communication assistant that helps improve your messages by providing formatting, tone, clarity, and grammar suggestions.
 
-Thanks to WorkOs for kindly sponsoring this video.
+Thanks to [WorkOs](https://dub.sh/workos-authkit) for kindly sponsoring this video.
 
 ## Features
 
