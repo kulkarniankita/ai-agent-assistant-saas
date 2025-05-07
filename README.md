@@ -56,15 +56,38 @@ Thanks to [WorkOs](https://dub.sh/workos-authkit) for kindly sponsoring this vid
 3. Set up environment variables:
    Create a `.env` file with the following variables:
 
-   ```
-   ANTHROPIC_API_KEY="your-anthropic-api-key"
-   ```
+```
+AUTH_SECRET="" # Added by `npx auth`. Read more: https://cli.authjs.dev
+
+# Deployment used by `npx convex dev`
+
+CONVEX_DEPLOYMENT=
+
+NEXT_PUBLIC_CONVEX_URL=
+
+DATABASE_URL=""
+
+# Workos
+
+WORKOS_API_KEY=''
+WORKOS_CLIENT_ID=''
+WORKOS_COOKIE_PASSWORD="" # use npx secret to generate
+
+# configured in the WorkOS dashboard
+
+NEXT_PUBLIC_WORKOS_REDIRECT_URI="" # Most likely http://localhost:3000/callback
+
+# Claude
+
+ANTHROPIC_API_KEY=""
+
+```
 
 4. Run the development server:
 
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
