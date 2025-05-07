@@ -40,6 +40,7 @@ export default function Chat({ user }: { user: User | null }) {
     setIsLoading(true);
     setError(null);
     try {
+      // We invoke the AI Agent here
       const data = await createAgentAssistantThreadAction({
         prompt: message,
         userId: user?.id || "",
